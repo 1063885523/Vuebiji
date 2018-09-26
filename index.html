@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .clearfix:after{
+            content: "";
+            display: table;
+            clear: both;
+        }
+        li{
+            list-style: none;
+        }
+        .inner{
+            padding-top: 30px;
+            width: 1300px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .left,.conter,.right{
+            float: left;
+        }
+        .top .conter{
+            text-align: center;
+            width: 20%;
+        }
+        .top .left,.top .right{
+            margin-top:11px;
+            width: 40%;
+            border-bottom: 1px solid #e4e4e4;
+            border-top: 1px solid #eeeeee;
+        }
+        .ping{
+            padding-bottom: 50px;
+        }
+        .ping li{
+            position: relative;
+        }
+        .ping .conter{
+            padding-left: 50px;
+            width: 1000px;
+        }
+        .ping .conter .h2{
+            width: 50%;
+            border: none;
+            outline: none;
+            padding: 20px 0;
+            font-size: 25px;
+            font-weight: 600;
+        }
+        .ping .conter p{
+            color: #9a9a9a;
+        }
+        .ping .left{
+            width: 100px;
+            color: #9a9a9a;
+            padding-top: 25px;
+        }
+        .ping .right{
+            color: #9a9a9a;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+        }
+        button.addbtn{
+            position: absolute;
+            right: 30px;
+            top: 70px;
+            z-index: 1;
+            width: 100px;
+            height: 30px;
+            background-color: cornflowerblue;
+            border: none;
+            color: white;
+            border-radius: 3px;
+        }
+        #textarea1{
+            width: 1135px; 
+            height: 175px;
+            padding-top: 10px;
+            padding-left: 10px;
+        }
+        .yin{
+            padding-top: 150px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 2;
+            line-height: 25px;
+            text-align: center;
+        }
+        .cang{
+            display: none;
+        }
+        .yin input{
+            width: 90%;
+            float: right;
+            line-height: 25px;
+        }
+        #textarea2{
+            width: 99%;
+            margin-top: 20px;
+            height: 200px;
+            padding-top: 10px;
+            padding-left: 10px;
+        }
+        .yin button{
+            width: 100px;
+            height: 30px;
+            background-color: cornflowerblue;
+            border: none;
+            color: white;
+            border-radius: 3px;
+        }
+        .clear{
+            width: 100px;
+            height: 30px;
+            background-color: cornflowerblue;
+            border: none;
+            color: white;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="inner">
+        <div id="app">
+            <div class="top clearfix">
+                <div class="left"></div>
+                <div class="conter">
+                    <h3><i></i>Notes App_Vue.js</h3>
+                </div>
+                <div class="right"></div>
+            </div>
+            <button class="addbtn" @click="yin">添加笔记</button>
+            <div class="yin" :class="{cang:cang}">
+                标题<input type="text" v-model="title1">
+                <textarea @keyup.enter="add" v-model="text1" name="" id="textarea2" cols="30" rows="10"></textarea>
+                <button @click="add">发布</button>
+            </div>
+            <ul class="ping">
+                <li class="clearfix" v-for="(pingLun,index) in pingLuns">
+                    <div class="left">
+                        {{pingLun.time}}
+                    </div>
+                    <div class="conter">
+                        <input @keyup="foc" v-model="pingLun.title" class="h2" type="text" :value="pingLun.title">
+                        <textarea @keyup="foc" v-model="pingLun.text" name="" id="textarea1" cols="30" rows="10">{{pingLun.text}}</textarea>
+                        <p>{{pingLun.text.length}}个字</p>
+                    </div>
+                    <div class="right">
+                        <i class="fa fa-trash-o" @click="splice(index)"></i>
+                    </div>
+                </li>
+            </ul>
+            <button class="clear" @click="del">全清</button>
+        </div>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+    <script>
+        var date=new Date();   
+        var year=date.getFullYear(); //获取当前年份   
+        var mon=date.getMonth()+1; //获取当前月份   
+        var da=date.getDate(); //获取当前日   
+        var day=date.getDay(); //获取当前星期几   
+        var h=date.getHours(); //获取小时   
+        var m=date.getMinutes(); //获取分钟   
+        var s=date.getSeconds(); //获取秒     
+        console.log('当前时间:'+year+'年'+mon+'月'+da+'日'+'星期'+day+' '+h+':'+m+':'+s)
+        new Vue({
+            el:"#app",
+            data:{
+                pingLuns:[],
+                cang:true,
+                title1:"",
+                text1:"",
+                num1:0
+            },
+            created:function(){
+                console.log(JSON.parse(localStorage.getItem('pinglun')))
+                if(JSON.parse(localStorage.getItem('pinglun'))==null){
+                    localStorage.setItem('pinglun',JSON.stringify([{title:"新建",text:"",time:year+"."+mon+"."+da+"."+h+"."+m}]));
+                    this.pingLuns=JSON.parse(localStorage.getItem('pinglun'));
+                }else{
+                    this.pingLuns=JSON.parse(localStorage.getItem('pinglun'));
+                }
+            },
+            methods:{
+                yin:function(){
+                    this.cang=!this.cang;
+                },
+                add:function(){
+                    if(this.title1!==""){
+                        this.pingLuns.unshift({title:this.title1,text:this.text1,time:year+"."+mon+"."+h+"."+m});
+                        localStorage.setItem('pinglun',JSON.stringify(this.pingLuns));
+                        this.cang=!this.cang;
+                    }
+                },
+                splice:function(e){
+                    this.pingLuns.splice(e,1);
+                    localStorage.setItem('pinglun',JSON.stringify(this.pingLuns));
+                },
+                foc:function(){
+                    localStorage.setItem('pinglun',JSON.stringify(this.pingLuns));
+                },
+                del:function(){
+                    localStorage.setItem('pinglun',JSON.stringify([{title:"新建",text:"",time:year+"."+mon+"."+da+"."+h+"."+m}]));
+                } 
+            }
+        })
+    </script>
+</body>
+</html>
+
+
+
+
+
+
